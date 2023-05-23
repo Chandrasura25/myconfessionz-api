@@ -2,9 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\CounselorReply;
+use App\Models\Counselorcomment;
+use App\Models\CounselorLikePost;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\CounselorLikeReply;
+use App\Models\CounselorLikeComment;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Counselor extends Model
 {
@@ -30,6 +36,28 @@ class Counselor extends Model
         'recovery_question2',
         'answer2',
         'recovery_question3',
-        'answer3'
+        'answer3',
+        'verified'
+
     ];
+
+    public function counselorcomments(){
+        return $this->hasMany(Counselorcomment::class);
+    }
+
+    public function counselorlikeposts(){
+        return $this->hasMany(CounselorLikePost::class);
+    }
+
+    public function counselorlikecomments(){
+        return $this->hasMany(CounselorLikeComment::class);
+    }
+
+    public function counselorlikereplies(){
+        return $this->hasMany(CounselorLikeReply::class);
+    }
+
+    public function counselorreplies(){
+        return $this->hasMany(CounselorReply::class);
+    }
 }

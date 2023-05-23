@@ -20,7 +20,7 @@ class AuthCounselorController extends Controller
             'dob' => 'required',
             'gender' => 'required',
             'country' => 'required',
-            'state' => 'required',
+            "state" => "required",
             'recovery_question1' => 'required',
             'answer1' => 'required',
             'recovery_question2' => 'required',
@@ -185,8 +185,4 @@ public function counselorPasswordReset(Request $request){
 
 }
 
-    public function hello(){
-        $res = auth()->user()->first_name;
-        return response()->json($res, 201);
-    }
 }

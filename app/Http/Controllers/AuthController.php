@@ -11,15 +11,15 @@ class AuthController extends Controller
         $request->validate([
             'usercode' => 'required|unique:users,usercode',
             'password' => 'required|string|min:8',
-            'dob' => 'required',
-            'gender' => 'required',
-            'country' => 'required',
-            'state' => 'required',
-            'recovery_question1' => 'required',
+            'dob' => 'required|date',
+            'gender' => 'required|string',
+            'country' => 'required|string',
+            'state' => 'required|string',
+            'recovery_question1' => 'required|string',
             'answer1' => 'required',
-            'recovery_question2' => 'required',
+            'recovery_question2' => 'required|string',
             'answer2' => 'required',
-            'recovery_question3' => 'required',
+            'recovery_question3' => 'required|string',
             'answer3' => 'required'
         ]);
 
@@ -173,4 +173,27 @@ class AuthController extends Controller
 
     }
 
+    public function deleteAccount($id){
+        // Find the user by ID
+        $user = User::find($id);
+
+
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        if($user->usercode != auth()->user()->usercode){
+                $response = [
+                    'message' => "Unauthorized action!"
+                ];
+
+                return response()->json($response, 200);
+            }
+
+        // Delete the user
+        $user->delete();
+
+        return response()->json(['message' => 'User account deleted'], 200);
+    }
 }
