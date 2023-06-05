@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\CounselorReply;
+use App\Models\Message;
 use App\Models\Counselorcomment;
 use App\Models\CounselorLikePost;
 use Laravel\Sanctum\HasApiTokens;
@@ -59,5 +60,9 @@ class Counselor extends Model
 
     public function counselorreplies(){
         return $this->hasMany(CounselorReply::class);
+    }
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'recipient_id');
     }
 }

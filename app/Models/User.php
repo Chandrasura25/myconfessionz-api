@@ -4,10 +4,10 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Anoncomment;
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -31,7 +31,7 @@ class User extends Authenticatable
         'answer2',
         'recovery_question3',
         'answer3',
-        'balance'
+        'balance',
     ];
 
     /**
@@ -53,27 +53,37 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function posts(){
+    public function posts()
+    {
         return $this->hasMany(Post::class);
     }
 
-    public function anoncomments(){
+    public function anoncomments()
+    {
         return $this->hasMany(Anoncomment::class);
     }
 
-    public function likeposts(){
+    public function likeposts()
+    {
         return $this->hasMany(LikePost::class);
     }
 
-    public function likecomments(){
+    public function likecomments()
+    {
         return $this->hasMany(LikeComment::class);
     }
 
-    public function likereplies(){
+    public function likereplies()
+    {
         return $this->hasMany(LikeReply::class);
     }
 
-    public function replies(){
+    public function replies()
+    {
         return $this->hasMany(Reply::class);
+    }
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
     }
 }

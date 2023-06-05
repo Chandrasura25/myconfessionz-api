@@ -1,13 +1,14 @@
 <?php
-
+ 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\LikeReplyController;
 use App\Http\Controllers\AnoncommentController;
-use App\Http\Controllers\LikeCommentController;
+use App\Http\Controllers\LikeCommentController; 
 use App\Http\Controllers\AnonlikepostController;
 use App\Http\Controllers\AuthCounselorController;
 use App\Http\Controllers\CounselorreplyController;
@@ -120,5 +121,10 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
 
     // MANAGE COUNSELOR ROUTES
     Route::delete('/delete-counselor-account/{id}', [CounselorManagementController::class, 'deleteAccount']);
+
+    // CHAT SYSTEM
+    Route::post('/chat/send-message', 'ChatController@sendMessage');
+    Route::get('/chat/messages', 'ChatController@getMessages');
+    Route::get('/chat/rooms', 'ChatController@getChatRooms');
 
 });

@@ -17,10 +17,13 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('image');
-            $table->integer('counseled_clients')->nullable();
+            $table->integer('counseled_clients')->default(0);
             $table->string('counseling_field');
             $table->bigInteger('earnings')->default(0);
-            $table->integer('satisfied_clients')->nullable();
+            $table->integer('satisfied_clients')->nullable(0); //only visible to the counselor
+            $table->integer('overall_satisfied_clients')->default(0);
+            $table->longText('review')->nullable();
+            $table->longText('bio');
             $table->string('gender');
             $table->date('dob');
             $table->string('country');
