@@ -19,7 +19,7 @@ class ChatController extends Controller
      */
     public function sendMessage(Request $request)
     {
-        event(new Message($request->input(key:'username'),$request->input(key:'message')));
+        // event(new Message($request->input(key:'username'),$request->input(key:'message')));
     }
 
     /**

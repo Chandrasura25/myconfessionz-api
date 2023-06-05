@@ -61,8 +61,13 @@ class Counselor extends Model
     public function counselorreplies(){
         return $this->hasMany(CounselorReply::class);
     }
-    public function messages()
+    public function sentMessages()
     {
-        return $this->hasMany(Message::class, 'recipient_id');
+        return $this->hasMany(Message::class, 'user_id');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'counselor_id');
     }
 }
