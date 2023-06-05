@@ -1,48 +1,23 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Events\MessageSent;
+
+use App\Models\Message;
 use Illuminate\Http\Request;
 
 class ChatController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function getMessages()
     {
-        //
-    }
+        $user = auth()->user(); // Retrieve the authenticated user
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function sendMessage(Request $request)
-    {
-        // event(new Message($request->input(key:'username'),$request->input(key:'message')));
-    }
+        // Retrieve the messages where the User is either the sender or recipient
+        $messages = Message::where(function ($query) use ($user) {
+            $query->where('user_id', $user->id)
+                ->orWhere('counselor_id', $user->id);
+        })->with('user', 'counselor')
+            ->get();
 
-    /**
-     * Display the specified resource.
-     */
-    public function getChatRooms(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json($messages, 200);
     }
 }

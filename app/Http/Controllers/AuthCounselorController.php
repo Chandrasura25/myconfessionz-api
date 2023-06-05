@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Counselor;
+use App\Models\Message;
 use Illuminate\Support\Facades\Hash;
 
 
@@ -184,5 +185,4 @@ public function counselorPasswordReset(Request $request){
     return response()->json($response, 200);
 
 }
-
 }

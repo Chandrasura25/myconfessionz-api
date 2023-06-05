@@ -11,6 +11,7 @@ use App\Http\Controllers\AnoncommentController;
 use App\Http\Controllers\LikeCommentController; 
 use App\Http\Controllers\AnonlikepostController;
 use App\Http\Controllers\AuthCounselorController;
+use App\Http\Controllers\CounsellorChatController;
 use App\Http\Controllers\CounselorreplyController;
 use App\Http\Controllers\CounselorSearchController;
 use App\Http\Controllers\CounselorcommentController;
@@ -80,7 +81,8 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::get('/counselors-by-field/{field}', [CounselorManagementController::class, 'counselorsByField']);
     Route::get('/all-counselors', [CounselorManagementController::class, 'allCounselors']);
 
-
+    //CHAT SYSTEM
+    Route::get('/messages',[ChatController::class,'getMessages']);
 });
 
 
@@ -122,9 +124,6 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     // MANAGE COUNSELOR ROUTES
     Route::delete('/delete-counselor-account/{id}', [CounselorManagementController::class, 'deleteAccount']);
 
-    // CHAT SYSTEM
-    Route::post('/chat/send-message', 'ChatController@sendMessage');
-    Route::get('/chat/messages', 'ChatController@getMessages');
-    Route::get('/chat/rooms', 'ChatController@getChatRooms');
-
+   //CHAT SYSTEM
+   Route::get('/messages',[CounsellorChatController::class,'getMessages']);
 });
