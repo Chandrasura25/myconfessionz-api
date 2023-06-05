@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
 use App\Models\Message;
 use Illuminate\Http\Request;
 
@@ -20,4 +21,23 @@ class ChatController extends Controller
 
         return response()->json($messages, 200);
     }
+    public function sendMessages(Request $request)
+    {
+        $user = auth()->user(); // Assuming the user is authenticated
+        $counselorId = $request->input('counselor_id');
+        $content = $request->input('content');
+
+        // Create a new message instance
+        $message = new Message();
+        $message->user_id = $user->id;
+        $message->counselor_id = $counselorId;
+        $message->content = $content;
+        $message->save();
+
+        // Broadcast the message using Pusher
+        event(new MessageSent($message));
+
+        return response()->json(['message' => 'Message sent successfully', 'data' => $message], 200);
+    }
+
 }
