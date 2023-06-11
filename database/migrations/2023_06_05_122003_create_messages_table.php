@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('messages', function (Blueprint $table) {
+         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('counselor_id');
+            $table->foreignId('conversation_id')->constrained();
+            $table->unsignedBigInteger('sender_id');
+            $table->unsignedBigInteger('receiver_id');
+            $table->string('sender_type'); // 'user' or 'counselor'
+            $table->boolean('read')->default(false);
             $table->text('content');
+            $table->string('type')->nullable();
             $table->timestamps();
-
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('counselor_id')->references('id')->on('counselors')->onDelete('cascade');
         });
     }
 

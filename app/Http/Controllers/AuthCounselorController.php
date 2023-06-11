@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Counselor; 
+use App\Models\Conversation;
 use Illuminate\Http\Request;
-use App\Models\Counselor;
-use App\Models\Message;
 use Illuminate\Support\Facades\Hash;
-
 
 class AuthCounselorController extends Controller
 {
-    public function registerCounselor(Request $request){
+    public function registerCounselor(Request $request)
+    {
         $request->validate([
             "username" => "required|string|unique:counselors,username",
             "firstName" => "required|string",
-            "lastName"  => "required|string",
+            "lastName" => "required|string",
             "image" => "required",
             "counselingField" => "required|string",
             'password' => 'required|string|min:8',
@@ -27,7 +27,7 @@ class AuthCounselorController extends Controller
             'recovery_question2' => 'required',
             'answer2' => 'required',
             'recovery_question3' => 'required',
-            'answer3' => 'required'
+            'answer3' => 'required',
         ]);
 
         $formFields = ([
@@ -48,7 +48,7 @@ class AuthCounselorController extends Controller
             'answer3' => $request->answer3,
         ]);
 
-        $newImageName = uniqid().'-'.'counselor'.'.'.$request->image->extension();
+        $newImageName = uniqid() . '-' . 'counselor' . '.' . $request->image->extension();
         $request->image->move(public_path('counselors'), $newImageName);
 
         $formFields['image'] = $newImageName;
@@ -59,13 +59,14 @@ class AuthCounselorController extends Controller
 
         $response = [
             "message" => $counselor,
-            "token" => $token
+            "token" => $token,
         ];
 
         return response()->json($response, 201);
     }
 
-    public function loginCounselor(Request $request){
+    public function loginCounselor(Request $request)
+    {
         $request->validate([
             "username" => "required",
             'password' => 'required',
@@ -76,9 +77,9 @@ class AuthCounselorController extends Controller
 
         // Check password
 
-        if(!$counselor || !Hash::check($request->password, $counselor->password)){
+        if (!$counselor || !Hash::check($request->password, $counselor->password)) {
             $response = [
-                'message' => 'Incorrect credentials'
+                'message' => 'Incorrect credentials',
             ];
 
             return response()->json($response, 401);
@@ -88,23 +89,25 @@ class AuthCounselorController extends Controller
 
         $response = [
             "message" => $counselor,
-            "token" => $token
+            "token" => $token,
         ];
 
         return response()->json($response, 201);
     }
 
-    public function logoutCounselor(Request $request){
+    public function logoutCounselor(Request $request)
+    {
         auth()->user()->tokens()->delete();
 
         $response = [
-            'message' => 'Logged out'
+            'message' => 'Logged out',
         ];
 
         return response()->json($response, 200);
     }
 
-    public function counselorPasswordResetRequest(Request $request){
+    public function counselorPasswordResetRequest(Request $request)
+    {
 
         $request->validate([
             'username' => 'required',
@@ -112,9 +115,9 @@ class AuthCounselorController extends Controller
 
         $counselor = Counselor::where('username', $request->username)->first();
 
-        if(!$counselor){
+        if (!$counselor) {
             $response = [
-                "message" => "User does not exists"
+                "message" => "User does not exists",
             ];
 
             return response()->json($response, 401);
@@ -123,14 +126,15 @@ class AuthCounselorController extends Controller
         $token = $counselor->createToken('novit17')->plainTextToken;
 
         $response = [
-            'message'=> 'Correct!',
-            "token" => $token
+            'message' => 'Correct!',
+            "token" => $token,
         ];
 
         return response()->json($response, 200);
     }
 
-    public function counselorPasswordRecoveryAnswer(Request $request){
+    public function counselorPasswordRecoveryAnswer(Request $request)
+    {
         $request->validate([
             'username' => 'required',
             'recovery_question' => 'required',
@@ -139,50 +143,79 @@ class AuthCounselorController extends Controller
 
         $counselor = Counselor::where('username', $request->username)->first();
 
-        if(!$counselor){
+        if (!$counselor) {
             $response = [
-                "message" => "Counselor does not exists"
+                "message" => "Counselor does not exists",
             ];
 
             return response()->json($response, 401);
         }
 
-        if(
+        if (
             (($request->recovery_question == $counselor->recovery_question1) && ($request->answer == $counselor->answer1)) ||
             (($request->recovery_question == $counselor->recovery_question2) && ($request->answer == $counselor->answer2)) ||
             (($request->recovery_question == $counselor->recovery_question3) && ($request->answer == $counselor->answer3))
-            ){
-                return response()->json(["message" => "correct!"], 200);
-            }
+        ) {
+            return response()->json(["message" => "correct!"], 200);
+        }
         return response()->json(["message" => "Recovery question and/or answer incorrect!"], 401);
 
-
     }
-public function counselorPasswordReset(Request $request){
-    $request->validate([
-        'username' => 'required',
-        'password' => 'required'
-    ]);
+    public function counselorPasswordReset(Request $request)
+    {
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required',
+        ]);
 
-    $counselor = Counselor::where('username', $request->username)->first();
+        $counselor = Counselor::where('username', $request->username)->first();
 
-    if(!$counselor){
+        if (!$counselor) {
+            $response = [
+                "message" => "Counselor does not exists",
+            ];
+
+            return response()->json($response, 401);
+        }
+
+        $password = bcrypt($request->password);
+
+        Counselor::where('username', $request->username)->update(['password' => $password]);
+
         $response = [
-            "message" => "Counselor does not exists"
+            'message' => "password changed successfully!",
         ];
 
-        return response()->json($response, 401);
+        return response()->json($response, 200);
+
+    }
+    public function getConversations()
+    {
+        $counselor = auth()->user();
+
+        $conversations = $counselor->conversations;
+
+        return response()->json([
+            'conversations' => $conversations,
+        ], 200);
+    }
+    public function getMessages($conversationId)
+{
+    $conversation = Conversation::findOrFail($conversationId);
+    
+    // Check if the authenticated counselor is a participant in the conversation
+    if ($conversation->counselor_id !== auth()->user()->id) {
+        return response()->json([
+            'error' => 'Unauthorized',
+        ], 401);
     }
 
-    $password = bcrypt($request->password);
+    $messages = $conversation->messages;
 
-    Counselor::where('username', $request->username)->update(['password' => $password]);
-
-    $response = [
-        'message' => "password changed successfully!"
-    ];
-
-    return response()->json($response, 200);
-
+    return response()->json([
+        'messages' => $messages,
+    ], 200);
 }
+
+
 }

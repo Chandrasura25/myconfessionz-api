@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Anoncomment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -84,12 +85,24 @@ class User extends Authenticatable
     }
     public function sentMessages()
     {
-        return $this->hasMany(Message::class, 'user_id');
+        return $this->hasMany(Message::class, 'sender_id');
     }
 
     public function receivedMessages()
     {
-        return $this->hasMany(Message::class, 'counselor_id');
+        return $this->hasMany(Message::class, 'receiver_id');
     }
-    
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'sender_id')->orWhere('receiver_id', $this->id);
+    }
+    // public function sentConversations()
+    // {
+    //     return $this->hasMany(Conversation::class, 'sender_id');
+    // }
+
+    // public function receivedConversations()
+    // {
+    //     return $this->hasMany(Conversation::class, 'receiver_id');
+    // }
 }

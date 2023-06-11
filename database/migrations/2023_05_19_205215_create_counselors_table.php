@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('counseled_clients')->default(0);
             $table->string('counseling_field');
             $table->bigInteger('earnings')->default(0);
-            $table->integer('satisfied_clients')->nullable(0); //only visible to the counselor
+            $table->integer('satisfied_clients')->default(0); //only visible to the counselor
             $table->integer('overall_satisfied_clients')->default(0);
             $table->longText('review')->nullable();
             $table->longText('bio');

@@ -11,6 +11,7 @@ use App\Http\Controllers\AnoncommentController;
 use App\Http\Controllers\LikeCommentController; 
 use App\Http\Controllers\AnonlikepostController;
 use App\Http\Controllers\AuthCounselorController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\CounsellorChatController;
 use App\Http\Controllers\CounselorreplyController;
 use App\Http\Controllers\CounselorSearchController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\CounselorlikepostController;
 use App\Http\Controllers\CounselorLikeReplyController;
 use App\Http\Controllers\CounselorManagementController;
 use App\Http\Controllers\CounselorLikeCommentController;
+use App\Http\Controllers\MessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,7 +84,22 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::get('/all-counselors', [CounselorManagementController::class, 'allCounselors']);
 
     //CHAT SYSTEM
-    Route::get('/messages',[ChatController::class,'getMessages']);
+    Route::post('/initiate-conversation', [ChatController::class, 'initiateConversation'])
+    ->name('conversation.initiate');
+
+    Route::get('/conversations', [AuthController::class, 'getUserConversations'])->name('users.conversations');
+    Route::get('/conversations/{conversationId}/messages', [AuthController::class, 'getMessages'])->name('users.conversations.messages');
+
+    // Route::get('/users/{user}/messages', [AuthController::class, 'getMessages'])->name('users.messages');
+
+    // Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    // Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+
+    // // Conversations
+    // Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
+    // Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])->name('conversations.show');
+    // Route::post('/conversations', [ConversationController::class, 'store'])->name('conversations.store');
+    // Route::post('/conversations/{conversation}/mark-as-read', [ConversationController::class, 'markAsRead'])->name('conversations.mark-as-read');
 });
 
 
@@ -125,5 +142,19 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::delete('/delete-counselor-account/{id}', [CounselorManagementController::class, 'deleteAccount']);
 
    //CHAT SYSTEM
-   Route::get('/messages',[CounsellorChatController::class,'getMessages']);
+   
+    // Messages
+    // Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    // Route::get('/messages/{message}', [MessageController::class, 'show'])->name('messages.show');
+    // Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+    Route::get('/conversations', [AuthCounselorController::class, 'getConversations'])->name('counselors.conversations');
+    Route::get('/conversations/{conversationId}/messages', [AuthCounselorController::class, 'getMessages'])->name('counselors.conversations.messages');
+    Route::post('/messages', [CounsellorChatController::class, 'sendMessage'])->name('counselor.messages.send');
+
+    
+    // // Conversations
+    // Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
+    // Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])->name('conversations.show');
+    // Route::post('/conversations', [ConversationController::class, 'store'])->name('conversations.store');
+    // Route::post('/conversations/{conversation}/mark-as-read', [ConversationController::class, 'markAsRead'])->name('conversations.mark-as-read');
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageSent;
+use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
 
@@ -22,35 +23,38 @@ class CounsellorChatController extends Controller
         return response()->json($messages, 200);
     }
 
-    public function sendMessages(Request $request)
+    public function sendMessage(Request $request)
     {
-        // Validate the request data
-        $request->validate([
-            'message_id' => 'required',
-            'content' => 'required',
-        ]);
-
-        // Retrieve the authenticated counselor
         $counselor = auth()->user();
-
-        // Find the message by its ID
-        $message = Message::find($request->input('message_id'));
-
-        // Check if the message exists and if the counselor is the recipient
-        if ($message && $message->counselor_id == $counselor->id) {
-            // Update the message with the counselor's reply
-            $message->reply = $request->input('content');
-            $message->save();
-
-            // Broadcast the message sent event
-            broadcast(new MessageSent($message))->toOthers();
-
-            // Return a JSON response with the updated message
-            return response()->json($message, 201);
+        $message = new Message();
+        $conversation = new Conversation();
+    
+        // Determine the sender and receiver based on the sender_type
+        if ($request->input('sender_type') === 'counselor') {
+            $sender = $counselor;
+            $receiver = $conversation->user;
+        } else {
+            $sender = $conversation->user;
+            $receiver = $counselor;
         }
-
-        // Return an error response if the message does not exist or the counselor is not the recipient
-        return response()->json(['error' => 'Invalid message or unauthorized.'], 403);
+    
+        // Create a new message
+        $newMessage = $message->create([
+            'conversation_id' => $request->input('conversation_id'),
+            'sender_id' => $sender->id,
+            'receiver_id' => $receiver->id,
+            'sender_type' => $request->input('sender_type'),
+            'read' => false,
+            'content' => $request->input('content'),
+            'type' => 'text',
+        ]);
+    
+        // Broadcast the message to the other participant(s)
+        event(new MessageSent($sender, $newMessage, $conversation));
+    
+        return response()->json([
+            'message' => $newMessage,
+        ], 200);
     }
-
+    
 }
