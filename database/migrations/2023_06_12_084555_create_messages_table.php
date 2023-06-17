@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-         Schema::create('messages', function (Blueprint $table) {
+        Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('conversation_id')->constrained();
+            $table->unsignedBigInteger('conversation_id');
+            $table->foreign('conversation_id')->references('id')->on('conversations')->onDelete('cascade');
             $table->unsignedBigInteger('sender_id');
             $table->unsignedBigInteger('receiver_id');
             $table->string('sender_type'); // 'user' or 'counselor'

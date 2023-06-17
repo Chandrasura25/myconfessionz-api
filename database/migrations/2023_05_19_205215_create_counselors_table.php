@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('satisfied_clients')->default(0); //only visible to the counselor
             $table->integer('overall_satisfied_clients')->default(0);
             $table->longText('review')->nullable();
-            $table->longText('bio');
+            $table->longText('bio')->default("I am great");
             $table->string('gender');
             $table->date('dob');
             $table->string('country');

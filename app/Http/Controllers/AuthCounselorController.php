@@ -18,7 +18,7 @@ class AuthCounselorController extends Controller
             "image" => "required",
             "counselingField" => "required|string",
             'password' => 'required|string|min:8',
-            'dob' => 'required',
+            'dob' => 'required|string',
             'gender' => 'required',
             'country' => 'required',
             "state" => "required",
