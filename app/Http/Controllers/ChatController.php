@@ -128,41 +128,4 @@ class ChatController extends Controller
             'message' => 'Message marked as read',
         ], 200);
     }
-    
-    // public function sendReply(Request $request)
-    // {
-    //     $user = Auth::user();
-    //     $counselor = $user->counselor;
-    //     $content = $request->input('content');
-
-    //     if ($counselor) {
-    //         $conversation = Conversation::where('sender_id', $counselor->id)
-    //             ->where('receiver_id', $user->id)
-    //             ->first();
-
-    //         if ($conversation) {
-    //             $message = Message::create([
-    //                 'conversation_id' => $conversation->id,
-    //                 'sender_id' => $counselor->id,
-    //                 'receiver_id' => $user->id,
-    //                 'sender_type' => 'counselor',
-    //                 'read' => false,
-    //                 'content' => $content,
-    //                 'type' => 'text',
-    //             ]);
-
-    //             $conversation->update(['last_time_message' => now()]);
-
-    //             return response()->json([
-    //                 'message' => $message,
-    //             ], 200);
-    //         } else {
-    //             // Conversation does not exist, handle the error
-    //             return response()->json(['error' => 'Conversation not found'], 404);
-    //         }
-    //     } else {
-    //         // User is not associated with a counselor, handle the error
-    //         return response()->json(['error' => 'User is not associated with a counselor'], 404);
-    //     }
-    // }
 }
