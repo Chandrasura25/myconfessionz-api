@@ -1,13 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Counselor;
-use App\Models\Conversation;
+
 use App\Events\MessageSent;
+use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
@@ -29,20 +29,8 @@ class ChatController extends Controller
                 'last_time_message' => now(),
             ]);
 
-            // Send the initial message
-            $message = Message::create([
-                'conversation_id' => $conversation->id,
-                'sender_id' => $userId,
-                'receiver_id' => $counselorId,
-                'sender_type' => 'user',
-                'read' => false,
-                'content' => $request->input('message'),
-                'type' => 'text',
-            ]);
-
             return response()->json([
                 'conversation' => $conversation,
-                'message' => $message,
             ], 200);
         } else {
             // Conversation already exists, return the existing conversation
@@ -51,6 +39,96 @@ class ChatController extends Controller
             ], 200);
         }
     }
+    public function getUserConversations()
+    {
+        $user = auth()->user();
+
+        // Retrieve the conversations where the user is the sender or receiver
+        $conversations = Conversation::where(function ($query) use ($user) {
+            $query->where('sender_id', $user->id)
+                ->orWhere('receiver_id', $user->id);
+        })->get();
+
+        return response()->json([
+            'conversations' => $conversations,
+        ], 200);
+    }
+    public function getMessages($conversationId)
+    {
+        $user = auth()->user();
+
+        // Retrieve the messages within the conversation for the authenticated user
+        $messages = Message::where('conversation_id', $conversationId)
+            ->where(function ($query) use ($user) {
+                $query->where('sender_id', $user->id)
+                    ->orWhere('receiver_id', $user->id);
+            })
+            ->get();
+
+        return response()->json([
+            'messages' => $messages,
+        ], 200);
+    }
+
+    public function sendMessage(Request $request)
+    {
+        $user = Auth::user();
+        $counselorId = $request->input('counselor_id');
+        $content = $request->input('content');
+
+        // Find the conversation between the user and counselor
+        $conversation = Conversation::where('sender_id', $user->id)
+            ->where('receiver_id', $counselorId)
+            ->first();
+
+        // Make sure the conversation exists
+        if (!$conversation) {
+            return response()->json([
+                'error' => 'Conversation not found',
+            ], 404);
+        }
+
+        // Create a new message
+        $message = Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => $user->id,
+            'receiver_id' => $counselorId,
+            'sender_type' => 'user',
+            'read' => false,
+            'content' => $content,
+            'type' => 'text',
+        ]);
+
+        // Fire the event for the new message sent
+        event(new MessageSent($user, $message, $conversation));
+
+        return response()->json([
+            'message' => 'Message sent successfully',
+        ], 200);
+    }
+    public function markAsRead($messageId)
+    {
+        $user = Auth::user();
+    
+        // Find the message by ID
+        $message = Message::find($messageId);
+    
+        // Make sure the message exists and belongs to the user
+        if (!$message || $message->receiver_id !== $user->id) {
+            return response()->json([
+                'error' => 'Message not found',
+            ], 404);
+        }
+    
+        // Update the message as read
+        $message->read = true;
+        $message->save();
+    
+        return response()->json([
+            'message' => 'Message marked as read',
+        ], 200);
+    }
+    
     // public function sendReply(Request $request)
     // {
     //     $user = Auth::user();
@@ -87,60 +165,4 @@ class ChatController extends Controller
     //         return response()->json(['error' => 'User is not associated with a counselor'], 404);
     //     }
     // }
-
-
-    // public function getMessages()
-    // {
-    //     $user = auth()->user(); // Retrieve the authenticated user
-
-    //     // Retrieve the messages where the User is either the sender or recipient
-    //     $messages = Message::where(function ($query) use ($user) {
-    //         $query->where('user_id', $user->id)
-    //             ->orWhere('counselor_id', $user->id);
-    //     })->with('user', 'counselor')
-    //         ->get();
-
-    //     return response()->json($messages, 200);
-    // }
-    public function sendMessage(Request $request)
-{
-    $user = Auth::user();
-    $counselorId = $request->input('counselor_id');
-    $content = $request->input('content');
-
-    // Check if a conversation already exists between the user and counselor
-    $conversation = Conversation::where('sender_id', $user->id)
-        ->where('receiver_id', $counselorId)
-        ->first();
-
-    // If no conversation exists, create a new one
-    if (!$conversation) {
-        $conversation = Conversation::create([
-            'sender_id' => $user->id,
-            'receiver_id' => $counselorId,
-            'last_time_message' => now(),
-        ]);
-    }
-
-    // Create a new message
-    $message = Message::create([
-        'conversation_id' => $conversation->id,
-        'sender_id' => $user->id,
-        'receiver_id' => $counselorId,
-        'sender_type' => 'user',
-        'read' => false,
-        'content' => $content,
-        'type' => 'text',
-    ]);
-
-    // Fire the event for the new message sent
-    event(new MessageSent($user, $message, $conversation));
-
-    return response()->json([
-        'message' => 'Message sent successfully',
-    ], 200);
-}
-
-
-
 }

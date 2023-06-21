@@ -86,20 +86,9 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     //CHAT SYSTEM
     Route::post('/initiate-conversation', [ChatController::class, 'initiateConversation'])
     ->name('conversation.initiate');
-
-    Route::get('/conversations', [AuthController::class, 'getUserConversations'])->name('users.conversations');
-    Route::get('/conversations/{conversationId}/messages', [AuthController::class, 'getMessages'])->name('users.conversations.messages');
-
-    // Route::get('/users/{user}/messages', [AuthController::class, 'getMessages'])->name('users.messages');
-
-    // Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-    // Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
-
-    // // Conversations
-    // Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
-    // Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])->name('conversations.show');
-    // Route::post('/conversations', [ConversationController::class, 'store'])->name('conversations.store');
-    // Route::post('/conversations/{conversation}/mark-as-read', [ConversationController::class, 'markAsRead'])->name('conversations.mark-as-read');
+    Route::get('/conversations', [ChatController::class, 'getUserConversations'])->name('users.conversations');
+    Route::get('/conversations/{conversationId}/messages', [ChatController::class, 'getMessages'])->name('users.conversations.messages');
+    Route::post('/messages/{id}/mark-as-read', [ChatController::class, 'markAsRead'])->name('user.messages.mark-as-read');
 });
 
 
@@ -142,19 +131,8 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::delete('/delete-counselor-account/{id}', [CounselorManagementController::class, 'deleteAccount']);
 
    //CHAT SYSTEM
-   
-    // Messages
-    // Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-    // Route::get('/messages/{message}', [MessageController::class, 'show'])->name('messages.show');
-    // Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
-    Route::get('/conversations', [AuthCounselorController::class, 'getConversations'])->name('counselors.conversations');
-    Route::get('/conversations/{conversationId}/messages', [AuthCounselorController::class, 'getMessages'])->name('counselors.conversations.messages');
+    Route::get('/conversations', [CounselorChatController::class, 'getConversations'])->name('counselors.conversations');
+    Route::get('/conversations/{conversationId}/messages', [CounselorChatController::class, 'getMessages'])->name('counselors.conversations.messages');
     Route::post('/messages', [CounsellorChatController::class, 'sendMessage'])->name('counselor.messages.send');
-
-    
-    // // Conversations
-    // Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
-    // Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])->name('conversations.show');
-    // Route::post('/conversations', [ConversationController::class, 'store'])->name('conversations.store');
-    // Route::post('/conversations/{conversation}/mark-as-read', [ConversationController::class, 'markAsRead'])->name('conversations.mark-as-read');
+    Route::post('/messages/{id}/mark-as-read', [CounselorChatController::class, 'markAsRead'])->name('counselors.messages.mark-as-read');
 });

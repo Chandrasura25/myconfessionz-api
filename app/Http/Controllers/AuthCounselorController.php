@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Counselor; 
 use App\Models\Conversation;
+use App\Models\Counselor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -189,33 +189,5 @@ class AuthCounselorController extends Controller
         return response()->json($response, 200);
 
     }
-    public function getConversations()
-    {
-        $counselor = auth()->user();
-
-        $conversations = $counselor->conversations;
-
-        return response()->json([
-            'conversations' => $conversations,
-        ], 200);
-    }
-    public function getMessages($conversationId)
-{
-    $conversation = Conversation::findOrFail($conversationId);
     
-    // Check if the authenticated counselor is a participant in the conversation
-    if ($conversation->counselor_id !== auth()->user()->id) {
-        return response()->json([
-            'error' => 'Unauthorized',
-        ], 401);
-    }
-
-    $messages = $conversation->messages;
-
-    return response()->json([
-        'messages' => $messages,
-    ], 200);
-}
-
-
 }

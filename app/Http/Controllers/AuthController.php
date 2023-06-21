@@ -202,35 +202,6 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'User account deleted'], 200);
     }
-    public function getUserConversations()
-    {
-        $user = auth()->user();
-
-        // Retrieve the conversations where the user is the sender or receiver
-        $conversations = Conversation::where(function ($query) use ($user) {
-            $query->where('sender_id', $user->id)
-                ->orWhere('receiver_id', $user->id);
-        })->get();
-
-        return response()->json([
-            'conversations' => $conversations,
-        ], 200);
-    }
-    public function getMessages($conversationId)
-    {
-        $user = auth()->user();
-
-        // Retrieve the messages within the conversation for the authenticated user
-        $messages = Message::where('conversation_id', $conversationId)
-            ->where(function ($query) use ($user) {
-                $query->where('sender_id', $user->id)
-                    ->orWhere('receiver_id', $user->id);
-            })
-            ->get();
-
-        return response()->json([
-            'messages' => $messages,
-        ], 200);
-    }
+    
 
 }
